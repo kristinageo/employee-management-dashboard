@@ -8,6 +8,27 @@ import getEmployees from '../services/employeeService'
 const employees = ref([]);
 const loading = ref(true)
 
+const getEmploymentStatus = (dateOfEmployment: string) => {
+   if(!dateOfEmployment) return 'Unknown'
+
+   const employmentDate = new Date(dateOfEmployment);
+   const now = new Date()
+
+   return employmentDate < now 
+   ? 'Currenly working'
+   : 'Employed soon'
+}
+
+const getTerminationStatus = (terminationDate: string) => {
+   if(!terminationDate) return 'Unknown'
+
+   const termination = new Date(terminationDate);
+   const now = new Date()
+
+   return termination < now 
+   ? 'To be terminated'
+   : 'Terminated'
+}
 
 onMounted(async() => {
   employees.value = await getEmployees()
@@ -28,11 +49,23 @@ onMounted(async() => {
             <Button icon="pi pi-trash"  text rounded severity="danger" @click="deleteRow(data)"></Button>
         </template>
       </Column>
-      <Column field="fullName" header="Employee Full Name"/>
-      <Column field="occupation" header="Occupation"/>
-      <Column field="department" header="Department" />
-      <Column field="dateOfEmployment" header="Date of Employment" />
-      <Column field="terminationDate" header="Termination Date" />
+      <Column field="fullName" header="Employee Full Name" sortable/>
+      <Column field="occupation" header="Occupation" sortable/>
+      <Column field="department" header="Department" sortable/>
+      <Column field="dateOfEmployment" header="Date of Employment" sortable>
+         <template #body="{data}">
+             <span>
+                 {{ getEmploymentStatus(data.dateOfEmployment) }}
+             </span>
+         </template>
+      </Column>
+      <Column field="terminationDate" header="Termination Date" sortable >
+        <template #body="{data}">
+             <span>
+                {{(getTerminationStatus(data.terminationDate))}}
+             </span>
+        </template>
+      </Column>
   </DataTable>
 </template>
 
