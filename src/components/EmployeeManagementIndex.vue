@@ -39,7 +39,12 @@ onMounted(async() => {
 </script>
 
 <template>
-  <DataTable :value="employees" :rows="5">
+  <DataTable paginator 
+      :value="employees" 
+      :rows="5" 
+      :totalRecords="employees.length"
+      showCurrentPageReport
+      currentPageReportTemplate ="Showing {first} to {last} of {totalRecords}">
       <Column field="actions" header="Actions">
         <template #body="{data}">
             <Button icon="pi pi-eye" text rounded @click="viewRow(data)"></Button>

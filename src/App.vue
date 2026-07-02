@@ -43,6 +43,8 @@ const currentComponent = computed(() => pages[activePage.value])
 <style scoped>
 span.active{
    background: lightseagreen;
-   color: white
+   color: white;
+   margin-right: 10px;
+   padding: 5px;
 }
 </style>
