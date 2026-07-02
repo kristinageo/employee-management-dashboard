@@ -3,15 +3,13 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from "primevue/button"
 import { ref, onMounted }  from 'vue'
-import employeesJson from '../data/purple_cross_employees.json'
 import type { Employee } from '@/types/Employee'
+import { getEmployees } from '@/services/employeeService'
 
 const employees = ref<Employee[]>([]);
-const loading = ref(true);
+const loading = ref(false);
 const totalRecords = ref(0);
-const allEmployees: Employee[] = employeesJson as Employee[];
-const page = ref(0)
-const rows = ref(5);
+
 
 
 
@@ -37,39 +35,24 @@ const getTerminationStatus = (terminationDate: string) => {
    : 'Terminated'
 }
 
-const loadPage = () => {
-    const start = page.value * rows.value;
-    const end = start + rows.value;
 
-    employees.value = allEmployees.slice(start, end)
-   // console.log(employees)
+
+const onPage = async (event:any) => {
+  loading.value = true;
+  const result = await getEmployees(event.first, event.rows)
+  employees.value = result.data;
+  totalRecords.value = result.totalRecords;
+  loading.value = false;
+
 }
 
-const onPage = (event:any) => {
-  page.value = event.page;
-  rows.value = event.rows;
-
-  loadPage()
-}
-
-
-function getEmployees(): Promise<Employee[]>{
-          return new Promise((resolve) => {
-              setTimeout(() => {
-                  resolve(employeesJson);
-              }, 500);
-          });
-}
 
 onMounted(async() => {
   loading.value = true;
-  const data = await getEmployees()
-  employees.value = data;
-  console.log('getEmployees:', data)
-  totalRecords.value = data.length;
-  loadPage()
-  loading.value = false;
-
+   const result = await getEmployees(0,5);
+   employees.value = result.data;
+   totalRecords.value = result.totalRecords;
+   loading.value = false;
 })
 
 
@@ -84,7 +67,7 @@ onMounted(async() => {
   <DataTable paginator 
       lazy
       :value="employees" 
-      :rows="rows" 
+      :rows="5" 
       :totalRecords="totalRecords"
       @page="onPage"
       :loading="loading"
