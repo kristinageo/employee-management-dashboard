@@ -1,12 +1,13 @@
 import { createApp } from 'vue'
-import EmployeeManagementIndex from './components/EmployeeManagementIndex.vue'
+
 
 import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
 import 'primeicons/primeicons.css'
+import App from './App.vue'
 
 
-const app = createApp(EmployeeManagementIndex)
+const app = createApp(App)
 app.use(PrimeVue, {
     theme:{
         preset: Aura

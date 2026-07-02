@@ -1,11 +1,48 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import EmployeeManagementIndex from './components/EmployeeManagementIndex.vue';
+import Dashboard from './components/Dashboard.vue';
+// import Department from './components/Department.vue';
+
+const activePage = ref('dashboard')
+
+const pages: Record<string, any> = {
+    dashboard: Dashboard,
+    employees: EmployeeManagementIndex
+}
+
+const navItems = computed(() =>
+  Object.keys(pages).map((key) => ({
+        key,
+        label: key.charAt(0).toUpperCase() + key.slice(1)
+  })
+ ))
+
+console.log(navItems)
+
+console.log(Object.keys(pages))
+
+const currentComponent = computed(() => pages[activePage.value])
+
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <p>test</p>
+  <nav>
+      <span v-for="item in navItems" 
+      :key="item.key"
+      @click="activePage = item.key"
+      :class="{active: activePage === item.key}">
+          {{item.label}}
+      </span>
+  </nav>
+  <component :is="currentComponent" />
+  
 </template>
 
-<style scoped></style>
+<style scoped>
+span.active{
+   background: lightseagreen;
+   color: white
+}
+</style>

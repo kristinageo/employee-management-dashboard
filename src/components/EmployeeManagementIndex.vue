@@ -5,6 +5,7 @@ import Button from "primevue/button"
 import { ref, onMounted }  from 'vue'
 import getEmployees from '../services/employeeService'
 
+
 const employees = ref([]);
 const loading = ref(true)
 
@@ -38,9 +39,6 @@ onMounted(async() => {
 </script>
 
 <template>
-  <p>
-    Employee Management Index Page
-  </p>
   <DataTable :value="employees" :rows="5">
       <Column field="actions" header="Actions">
         <template #body="{data}">
