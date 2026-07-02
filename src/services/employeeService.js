@@ -1,9 +1,5 @@
 
 
-/**
- * @returns {Promise<any[]>}
- */
-
 
 
 import employees from "../data/purple_cross_employees.json"
@@ -15,3 +11,4 @@ export default function getEmployees(params) {
         }, 500);
     })
 }
+

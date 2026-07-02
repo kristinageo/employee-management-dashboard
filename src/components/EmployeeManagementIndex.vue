@@ -3,11 +3,17 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from "primevue/button"
 import { ref, onMounted }  from 'vue'
-import getEmployees from '../services/employeeService'
+import employeesJson from '../data/purple_cross_employees.json'
+import type { Employee } from '@/types/Employee'
+
+const employees = ref<Employee[]>([]);
+const loading = ref(true);
+const totalRecords = ref(0);
+const allEmployees: Employee[] = employeesJson as Employee[];
+const page = ref(0)
+const rows = ref(5);
 
 
-const employees = ref([]);
-const loading = ref(true)
 
 const getEmploymentStatus = (dateOfEmployment: string) => {
    if(!dateOfEmployment) return 'Unknown'
@@ -31,18 +37,57 @@ const getTerminationStatus = (terminationDate: string) => {
    : 'Terminated'
 }
 
+const loadPage = () => {
+    const start = page.value * rows.value;
+    const end = start + rows.value;
+
+    employees.value = allEmployees.slice(start, end)
+   // console.log(employees)
+}
+
+const onPage = (event:any) => {
+  page.value = event.page;
+  rows.value = event.rows;
+
+  loadPage()
+}
+
+
+function getEmployees(): Promise<Employee[]>{
+          return new Promise((resolve) => {
+              setTimeout(() => {
+                  resolve(employeesJson);
+              }, 500);
+          });
+}
+
 onMounted(async() => {
-  employees.value = await getEmployees()
+  loading.value = true;
+  const data = await getEmployees()
+  employees.value = data;
+  console.log('getEmployees:', data)
+  totalRecords.value = data.length;
+  loadPage()
   loading.value = false;
+
 })
 
+
+</script>
+
+<script setup lang="ts">
+
+    
 </script>
 
 <template>
   <DataTable paginator 
+      lazy
       :value="employees" 
-      :rows="5" 
-      :totalRecords="employees.length"
+      :rows="rows" 
+      :totalRecords="totalRecords"
+      @page="onPage"
+      :loading="loading"
       showCurrentPageReport
       currentPageReportTemplate ="Showing {first} to {last} of {totalRecords}">
       <Column field="actions" header="Actions">

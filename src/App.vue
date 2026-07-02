@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import EmployeeManagementIndex from './components/EmployeeManagementIndex.vue';
 import Dashboard from './components/Dashboard.vue';
+import { Button } from 'primevue';
 // import Department from './components/Department.vue';
 
 const activePage = ref('dashboard')
@@ -18,23 +19,25 @@ const navItems = computed(() =>
   })
  ))
 
-console.log(navItems)
 
-console.log(Object.keys(pages))
 
 const currentComponent = computed(() => pages[activePage.value])
 
 </script>
 
 <template>
-  <p>test</p>
-  <nav>
-      <span v-for="item in navItems" 
-      :key="item.key"
-      @click="activePage = item.key"
-      :class="{active: activePage === item.key}">
-          {{item.label}}
-      </span>
+  <nav class="navbar">
+     <div class="nav-left">
+           <span v-for="item in navItems" 
+            :key="item.key"
+            @click="activePage = item.key"
+            :class="{active: activePage === item.key}">
+                {{item.label}}
+            </span>
+     </div>
+     <div class="nav-right">
+         <Button icon="pi pi-user" label="Sign In"></Button>
+     </div>
   </nav>
   <component :is="currentComponent" />
   
@@ -44,7 +47,22 @@ const currentComponent = computed(() => pages[activePage.value])
 span.active{
    background: lightseagreen;
    color: white;
-   margin-right: 10px;
    padding: 5px;
+}
+.navbar{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid lightgray;
+  padding-bottom: 5px;
+}
+
+.nav-left span{
+  margin: 5px;
+  cursor: pointer;
+}
+.nav-right{
+  display: flex;
+  align-items: center;
 }
 </style>
