@@ -5,13 +5,39 @@ import Button from "primevue/button"
 import { ref, onMounted }  from 'vue'
 import type { Employee } from '@/types/Employee'
 import { getEmployees } from '@/services/employeeService'
+import { useRouter } from 'vue-router'
+import { useEmployeeStore } from '@/stores/employeeStore'
+import EditEmployee from './EditEmployee.vue'
+import DeleteEmployee from './DeleteEmployee.vue'
+
 
 const employees = ref<Employee[]>([]);
 const loading = ref(false);
 const totalRecords = ref(0);
+const router = useRouter()
+const {setSelectedEmployee, cacheEmployees} = useEmployeeStore()
 
+function viewEmployee(employee: Employee){
+   setSelectedEmployee(employee)
+    router.push({
+       name: 'employee-detail',
+       params: { code: employee.code }
+   })
+}    
 
+function editEmployee(employee: Employee)
+{
+  setSelectedEmployee(employee)
+  router.push({
+      name: 'employee-detail-edit',
+      params: { code: employee.code }
+  })
+}
 
+function deleteEmployee(employee: Employee)
+{
+  
+}
 
 const getEmploymentStatus = (dateOfEmployment: string) => {
    if(!dateOfEmployment) return 'Unknown'
@@ -20,7 +46,7 @@ const getEmploymentStatus = (dateOfEmployment: string) => {
    const now = new Date()
 
    return employmentDate < now 
-   ? 'Currenly working'
+   ? 'Currently working'
    : 'Employed soon'
 }
 
@@ -31,8 +57,8 @@ const getTerminationStatus = (terminationDate: string) => {
    const now = new Date()
 
    return termination < now 
-   ? 'To be terminated'
-   : 'Terminated'
+   ? 'Terminated'
+   : 'To be terminated'
 }
 
 
@@ -42,9 +68,12 @@ const onPage = async (event:any) => {
   const result = await getEmployees(event.first, event.rows)
   employees.value = result.data;
   totalRecords.value = result.totalRecords;
+  cacheEmployees(result.data);
   loading.value = false;
 
 }
+
+
 
 
 onMounted(async() => {
@@ -52,15 +81,10 @@ onMounted(async() => {
    const result = await getEmployees(0,5);
    employees.value = result.data;
    totalRecords.value = result.totalRecords;
+   cacheEmployees(result.data);
    loading.value = false;
 })
 
-
-</script>
-
-<script setup lang="ts">
-
-    
 </script>
 
 <template>
@@ -70,14 +94,16 @@ onMounted(async() => {
       :rows="5" 
       :totalRecords="totalRecords"
       @page="onPage"
+      scrollable
+      scrollHeight="flex"
       :loading="loading"
       showCurrentPageReport
       currentPageReportTemplate ="Showing {first} to {last} of {totalRecords}">
       <Column field="actions" header="Actions">
         <template #body="{data}">
-            <Button icon="pi pi-eye" text rounded @click="viewRow(data)"></Button>
-            <Button icon="pi pi-pencil"  text rounded @click="editRow(data)"></Button>
-            <Button icon="pi pi-trash"  text rounded severity="danger" @click="deleteRow(data)"></Button>
+            <Button icon="pi pi-eye" text rounded @click="viewEmployee(data)"></Button>
+            <Button icon="pi pi-pencil"  text rounded @click="editEmployee(data)"></Button>
+            <Button icon="pi pi-trash"  text rounded severity="danger" @click="deleteEmployee(data)"></Button>
         </template>
       </Column>
       <Column field="fullName" header="Employee Full Name" sortable/>
@@ -98,5 +124,16 @@ onMounted(async() => {
         </template>
       </Column>
   </DataTable>
+  <div class="add-container">
+      <Button label="Create New Employee" icon="pi pi-plus"></Button>
+  </div>
 </template>
 
+<style>
+.add-container{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+</style>

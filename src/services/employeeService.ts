@@ -1,4 +1,4 @@
-import employeesJson from '../data/purple_cross_employees.json'
+import employeesJson from '@/data/purple_cross_employees.json'
 import type { Employee } from '@/types/Employee'
 
 
@@ -6,8 +6,8 @@ const allEmployees: Employee[] = employeesJson as Employee[];
 
 export  function getEmployees(first: number, rows: number): Promise<{
     data: Employee[],
-    totalRecords: number
-}>{
+    totalRecords: number}>
+    {
           return new Promise((resolve) => {
               setTimeout(() => {
                   resolve({
