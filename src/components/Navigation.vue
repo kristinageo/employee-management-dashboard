@@ -17,7 +17,6 @@
    background: lightseagreen;
    color: white;
    border-radius: 4px;
-
 }
 
 a{

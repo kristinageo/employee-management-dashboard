@@ -2,13 +2,13 @@
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from "primevue/button"
+import ConfirmDialog from 'primevue/confirmdialog'
 import { ref, onMounted }  from 'vue'
 import type { Employee } from '@/types/Employee'
 import { getEmployees } from '@/services/employeeService'
 import { useRouter } from 'vue-router'
 import { useEmployeeStore } from '@/stores/employeeStore'
-import EditEmployee from './EditEmployee.vue'
-import DeleteEmployee from './DeleteEmployee.vue'
+import { useConfirm } from 'primevue/useconfirm'
 
 
 const employees = ref<Employee[]>([]);
@@ -16,6 +16,7 @@ const loading = ref(false);
 const totalRecords = ref(0);
 const router = useRouter()
 const {setSelectedEmployee, cacheEmployees} = useEmployeeStore()
+const confirm = useConfirm();
 
 function viewEmployee(employee: Employee){
    setSelectedEmployee(employee)
@@ -34,9 +35,29 @@ function editEmployee(employee: Employee)
   })
 }
 
+
 function deleteEmployee(employee: Employee)
 {
-  
+     confirm.require({
+      message: `Are you sure you want to delete ${employee.fullName} ?`,
+      header: 'Confirmation required',
+      icon: 'pi pi-exclamation-triangle',
+      rejectProps: 
+      {
+        label: 'Close',
+        severity: 'secondary'
+      },
+      acceptProps: 
+      {
+        label:'Save',
+        severity: 'danger'
+      },
+      accept: () => {
+          employees.value = employees.value.filter(emp => emp.code != employee.code)
+          useEmployeeStore().employeesCache = useEmployeeStore().employeesCache.filter(emp => emp.code != employee.code)
+          totalRecords.value = Math.max(0, totalRecords.value - 1);
+      }
+     })
 }
 
 const getEmploymentStatus = (dateOfEmployment: string) => {
@@ -88,6 +109,7 @@ onMounted(async() => {
 </script>
 
 <template>
+  <ConfirmDialog></ConfirmDialog>
   <DataTable paginator 
       lazy
       :value="employees" 

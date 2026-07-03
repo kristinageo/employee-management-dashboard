@@ -4,6 +4,7 @@ import EmployeeManagementIndex from '@/components/EmployeeManagementIndex.vue'
 import ViewEmployee from '@/components/ViewEmployee.vue'
 import EditEmployee from '@/components/EditEmployee.vue'
 
+
 const routes = [
     {
         path: '/',
