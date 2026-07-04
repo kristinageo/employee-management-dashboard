@@ -1,14 +1,26 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { Employee } from '@/types/Employee'
 import employeeData from '@/data/purple_cross_employees.json'
 
 export const useEmployeeStore = defineStore('employee', () => {
-  // ---------------- STATE ----------------
   const employeesCache = ref<Employee[]>(employeeData as Employee[])
   const selectedEmployee = ref<Employee | null>(null)
+  const totalDepartments = computed(() => {
+      const departments = new Set(
+        employeesCache.value.map(e => e.department)
+      )
 
-  // ---------------- GETTER ----------------
+      return departments.size
+  })
+  const totalYearHires = computed(() => {
+      const year = new Date().getFullYear()
+      return employeesCache.value.filter(e => {
+            if (!e.dateOfEmployment) return false
+            return new Date(e.dateOfEmployment).getFullYear() === year
+      }).length
+  })
+
   function getEmployeeByCode(code: string) {
     return employeesCache.value.find(emp => emp.code === code) || null
   }
@@ -69,18 +81,17 @@ export const useEmployeeStore = defineStore('employee', () => {
         
 
           if (filter.length === 4) {
-            return iso.startsWith(filter) // year
+            return iso.startsWith(filter) 
           }
 
           if (filter.length === 7) {
-            return iso.startsWith(filter) // year-month
+            return iso.startsWith(filter) 
           }
 
-          return iso === filter // full date
+          return iso === filter 
         })
       }
 
-      // ---------------- SORT ----------------
       if (sortField) {
         data.sort((a: any, b: any) => {
           const v1 = a[sortField]
@@ -94,7 +105,7 @@ export const useEmployeeStore = defineStore('employee', () => {
         })
       }
 
-      // ---------------- PAGINATION ----------------
+      // TO GET THE NEEDED PAGINATION PAGE BY PAGE
       const totalRecords = data.length
       const paged = data.slice(first, first + rows)
 
@@ -106,17 +117,17 @@ export const useEmployeeStore = defineStore('employee', () => {
   })
 }
 
-  // ---------------- SELECT ----------------
+  //SET SELECTED EMPLOYEE FOR EDIT OR DELETE SO THAT WE KNOW WHICH EMPLOYEE IS CHOSEN
   function setSelectedEmployee(employee: Employee | null) {
     selectedEmployee.value = employee
   }
 
-  // ---------------- CREATE ----------------
+  // CREATE NEW EMPLOYEE BASED ON THE INFO INSIDE PARAMS
   function createEmployee(employee: Employee) {
     employeesCache.value.push(employee)
   }
 
-  // ---------------- UPDATE ----------------
+  // EDIT/UPDATE THE DATA FOR SELECTED EMPLOYEE
   function updateEmployee(employee: Employee) {
     const index = employeesCache.value.findIndex(
       e => e.code === employee.code
@@ -127,14 +138,14 @@ export const useEmployeeStore = defineStore('employee', () => {
     }
   }
 
-  // ---------------- DELETE ----------------
+  // DELETE THE SELECTED EMPLOYEE FROM THE LIST
   function deleteEmployee(code: string) {
     employeesCache.value = employeesCache.value.filter(
       e => e.code !== code
     )
   }
 
-  // ---------------- MERGE / CACHE API DATA ----------------
+  // CACHE THE EMPLOYEES SO THAT WE HAVE ALWAYS THE CORRECT LIST
   function cacheEmployees(newEmployees: Employee[]) {
     newEmployees.forEach(emp => {
       const index = employeesCache.value.findIndex(
@@ -158,6 +169,8 @@ export const useEmployeeStore = defineStore('employee', () => {
     createEmployee,
     updateEmployee,
     deleteEmployee,
-    cacheEmployees
+    cacheEmployees,
+    totalYearHires,
+    totalDepartments
   }
 })

@@ -20,7 +20,7 @@ const employees = ref<Employee[]>([])
 const loading = ref(false)
 const totalRecords = ref(0)
 
-// -------------------- NAVIGATION --------------------
+// VIEW FEATURE TO SEE DETAILS ABOUT SPECIFIC EMPLOYEE
 
 function viewEmployee(employee: Employee) {
   employeeStore.setSelectedEmployee(employee)
@@ -44,7 +44,7 @@ function createEmployee() {
   router.push({ name: 'create-employee' })
 }
 
-// -------------------- DELETE --------------------
+// DELETE FEATURE FOR EMPLOYEE
 
 function deleteEmployee(employee: Employee) {
   confirm.require({
@@ -59,7 +59,7 @@ function deleteEmployee(employee: Employee) {
   })
 }
 
-// -------------------- STATUS HELPERS --------------------
+// GET TEXT DESCRIPTIONS FOR THE DATES
 
 function getEmploymentStatus(dateOfEmployment: string) {
   if (!dateOfEmployment) return 'Unknown'
@@ -115,6 +115,13 @@ const onFilter = async (event: any) => {
 const onSort = async (event: any) => {
   loadData(event.first, event.rows, filters.value, event.sortField, event.sortOrder)
 }
+
+const statusOptions = [
+  { label: 'Active', value: 'Active' },
+  { label: 'To be terminated', value: 'To be terminated' },
+  { label: 'Terminated', value: 'Terminated' }
+]
+
 </script>
 <template>
   <ConfirmDialog />
