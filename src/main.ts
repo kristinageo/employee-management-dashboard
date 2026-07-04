@@ -20,7 +20,7 @@ app.use(PrimeVue, {
 })
 app.use(createPinia())
 app.use(router)
-
+//ALL NEEDED COMPONENTS THROUGHOUT THE APP
 app.component('Button', Button)
 app.component('DataTable', DataTable)
 app.component('Column', Column)

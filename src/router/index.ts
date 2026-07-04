@@ -5,6 +5,7 @@ import ViewEmployee from '@/components/ViewEmployee.vue'
 import EmployeeForm from '@/components/EmployeeForm.vue'
 
 
+//ALL NEEDED ROUTES FOR THIS APP
 const routes = [
     {
         path: '/',

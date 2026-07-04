@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+
+//SIMPLE LOGIN FEATURE//CAN MAKE SIGN IN SIGN OUT FORM AND ROLES FOR COMPLEX SOLUTION
 const isLoggedIn = ref(false)
 function toggleLogin(){
   isLoggedIn.value = true;

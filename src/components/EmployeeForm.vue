@@ -7,9 +7,11 @@ import type { Employee } from '@/types/Employee'
 const route = useRoute()
 const router = useRouter()
 const store = useEmployeeStore()
-
+//CHECK IF IT IS EDIT OR CREATE FORM WITH BOOLEAN
 const isEdit = computed(() => !!route.params.code)
 
+
+//FORM FOR ALL FIELDS
 const form = ref<Employee>({
   code: '',
   fullName: '',
@@ -29,6 +31,7 @@ watchEffect(() => {
   }
 })
 
+//ERROR MSG FOR ALL FIELDS
 const errors = ref({
   fullName: '',
   occupation: '',
@@ -36,6 +39,7 @@ const errors = ref({
   dateOfEmployment: ''
 })
 
+//VALIDATION NEEDED
 function validate() {
   errors.value = {
     fullName: '',
@@ -65,6 +69,8 @@ function validate() {
     errors.value.dateOfEmployment = 'Date of employment is required'
     valid = false
   }
+  
+  //TERMINATION IS NOT REQUIRED BECAUSE I THOUGHT IF THERE IS NULL VALUES WE CAN ENTER EMPTY VALUES HERE
 
   return valid
 }

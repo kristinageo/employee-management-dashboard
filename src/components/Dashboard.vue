@@ -5,6 +5,8 @@ import { useEmployeeStore } from '@/stores/employeeStore';
 
 const store  = useEmployeeStore()
 
+
+//STATS ARRAY FOR LOADING INTO THE CARDS
 const stats = computed(() => [
   {
     label: "Total Employees",

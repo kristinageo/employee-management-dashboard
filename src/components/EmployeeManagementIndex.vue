@@ -20,12 +20,10 @@ const employees = ref<Employee[]>([])
 const loading = ref(false)
 const totalRecords = ref(0)
 
-const statusOptions = [
-  
+const statusOptions = [ 
     'Unknown',
     'To be terminated',
-    'Terminated'
-  
+    'Terminated' 
 ]
 
 // VIEW FEATURE TO SEE DETAILS ABOUT SPECIFIC EMPLOYEE
@@ -84,12 +82,15 @@ function getEmploymentStatus(dateOfEmployment: string) {
 // }
 
 onMounted(async () => {
+  //LOAD THE EMPLOYEES IN THE TABLE 
   loading.value = true
   const result = await employeeStore.getEmployees(0, 5)
   totalRecords.value = result.totalRecords
   employees.value  = result.data;
   loading.value = false
 })
+
+//FILTERS NEEDED FOR PRIMEVUE
 
 const filters = ref<DataTableFilterMeta>({
   global: { value: null, matchMode: 'contains' },

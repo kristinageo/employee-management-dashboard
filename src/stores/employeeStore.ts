@@ -3,9 +3,13 @@ import { computed, ref } from 'vue'
 import type { Employee } from '@/types/Employee'
 import employeeData from '@/data/purple_cross_employees.json'
 
+//STORE FOR Purple Cross Ltd
+
 export const useEmployeeStore = defineStore('employee', () => {
   const employeesCache = ref<Employee[]>(employeeData as Employee[])
   const selectedEmployee = ref<Employee | null>(null)
+
+  //HOW MANY DEPARTMENTS ARE IN THIS LIST
   const totalDepartments = computed(() => {
       const departments = new Set(
         employeesCache.value.map(e => e.department)
@@ -13,6 +17,8 @@ export const useEmployeeStore = defineStore('employee', () => {
 
       return departments.size
   })
+
+  //GET TERMINATION STATUS WITH DESCRIPTION
 
   const getTerminationStatus = (date: string | null) => {
       if (!date) return 'Unknown'
@@ -23,6 +29,8 @@ export const useEmployeeStore = defineStore('employee', () => {
       if (d > now) return 'To be terminated'
       return 'Terminated'
   }
+
+  //TOTAL HIRES IN A YEAR
   const totalYearHires = computed(() => {
       const year = new Date().getFullYear()
       return employeesCache.value.filter(e => {
@@ -46,7 +54,7 @@ export const useEmployeeStore = defineStore('employee', () => {
     setTimeout(() => {
       let data = [...employeeData]
 
-      // ---------------- FILTER ----------------
+      // FILTER FOR ALL COLUMNS
       if (filters?.global?.value) {
         const search = filters.global.value.toLowerCase()
         data = data.filter(e =>
@@ -58,7 +66,7 @@ export const useEmployeeStore = defineStore('employee', () => {
 
       if (filters?.department?.value) {
 
-        console.log(filters?.department.value)
+        //console.log(filters?.department.value)
         data = data.filter(e =>
           e.department
             .toLowerCase()
@@ -109,6 +117,8 @@ export const useEmployeeStore = defineStore('employee', () => {
         })
         console.log(data);
       }
+
+      //SORT FOR ALL COLUMNS
 
       if (sortField) {
         data.sort((a: any, b: any) => {
