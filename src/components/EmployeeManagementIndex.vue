@@ -20,6 +20,14 @@ const employees = ref<Employee[]>([])
 const loading = ref(false)
 const totalRecords = ref(0)
 
+const statusOptions = [
+  
+    'Unknown',
+    'To be terminated',
+    'Terminated'
+  
+]
+
 // VIEW FEATURE TO SEE DETAILS ABOUT SPECIFIC EMPLOYEE
 
 function viewEmployee(employee: Employee) {
@@ -68,12 +76,12 @@ function getEmploymentStatus(dateOfEmployment: string) {
   return d < new Date() ? 'Currently working' : 'Employed soon'
 }
 
-function getTerminationStatus(terminationDate: string) {
-  if (!terminationDate) return 'Unknown'
+// function getTerminationStatus(terminationDate: string) {
+//   if (!terminationDate) return 'Unknown'
 
-  const d = new Date(terminationDate)
-  return d < new Date() ? 'Terminated' : 'To be terminated'
-}
+//   const d = new Date(terminationDate)
+//   return d < new Date() ? 'Terminated' : 'To be terminated'
+// }
 
 onMounted(async () => {
   loading.value = true
@@ -88,7 +96,8 @@ const filters = ref<DataTableFilterMeta>({
   fullName: { value: null, matchMode: 'contains' },
   department: { value: null, matchMode: 'contains' },
   occupation: { value: null, matchMode: 'contains' },
-  dateOfEmployment: { value: null, matchMode: 'contains'}
+  dateOfEmployment: { value: null, matchMode: 'contains'},
+  terminationStatus: { value: null, matchMode: 'equals' }
 })
 
 
@@ -195,10 +204,11 @@ const onSort = async (event: any) => {
     </Column>
 
 
-    <Column field="dateOfEmployment" header="Date of Employment" 
+    <Column field="dateOfEmployment" 
+      header="Employment Status" 
+      filterField="dateOfEmployment"
       sortable
       filter
-      filterField="dateOfEmployment"
       :showFilterMenu="false">
       <template #body="{ data }">
         {{ getEmploymentStatus(data.dateOfEmployment) }}
@@ -212,9 +222,25 @@ const onSort = async (event: any) => {
       </template>
     </Column>
 
-    <Column field="terminationDate" header="Termination Date" sortable filter>
+    <Column
+      field="terminationDate"
+      header="Termination Status"
+      filterField="terminationStatus"
+      sortable
+      filter
+      :showFilterMenu="false"
+    >
       <template #body="{ data }">
-        {{ getTerminationStatus(data.terminationDate) }}
+        {{ employeeStore.getTerminationStatus(data.terminationDate) }}
+      </template>
+
+      <template #filter="{ filterModel, filterCallback }">
+        <Select
+          v-model="filterModel.value"
+          :options="statusOptions"
+          placeholder="Select status"
+          @change="filterCallback()"
+        />
       </template>
     </Column>
   </DataTable>

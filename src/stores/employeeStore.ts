@@ -13,6 +13,16 @@ export const useEmployeeStore = defineStore('employee', () => {
 
       return departments.size
   })
+
+  const getTerminationStatus = (date: string | null) => {
+      if (!date) return 'Unknown'
+
+      const d = new Date(date)
+      const now = new Date()
+
+      if (d > now) return 'To be terminated'
+      return 'Terminated'
+  }
   const totalYearHires = computed(() => {
       const year = new Date().getFullYear()
       return employeesCache.value.filter(e => {
@@ -90,6 +100,14 @@ export const useEmployeeStore = defineStore('employee', () => {
 
           return iso === filter 
         })
+      }
+
+      if (filters?.terminationStatus?.value) {
+        console.log(filters?.terminationStatus?.value);
+        data = data.filter(e => {
+          return getTerminationStatus(e.terminationDate) === filters.terminationStatus.value
+        })
+        console.log(data);
       }
 
       if (sortField) {
@@ -171,6 +189,7 @@ export const useEmployeeStore = defineStore('employee', () => {
     deleteEmployee,
     cacheEmployees,
     totalYearHires,
-    totalDepartments
+    totalDepartments,
+    getTerminationStatus
   }
 })

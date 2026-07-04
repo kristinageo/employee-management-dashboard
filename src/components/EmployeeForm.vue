@@ -69,6 +69,7 @@ function validate() {
   return valid
 }
 
+//form to save the employee first validate and then if edit is true update if not create it.
 function saveEmployee() {
   if (!validate()) return
 
@@ -113,14 +114,13 @@ function cancel() {
 
     <div class="field">
       <label>Date of Employment</label>
-      <!-- <InputText v-model="form.dateOfEmployment" /> -->
       <input type="date" v-model="form.dateOfEmployment" />
       <small class="error">{{ errors.dateOfEmployment }}</small>
     </div>
 
     <div class="field">
       <label>Termination Date</label>
-      <InputText v-model="form.terminationDate" />
+      <input type="date" v-model="form.dateOfEmployment" />
     </div>
 
     <div class="actions">

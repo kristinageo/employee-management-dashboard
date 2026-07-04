@@ -10,6 +10,7 @@ import { Button, Column, DataTable, InputText } from 'primevue'
 import ConfirmationService from 'primevue/confirmationservice'
 import { createPinia } from 'pinia'
 import DatePicker from 'primevue/datepicker'
+import Select from 'primevue/select'
 
 const app = createApp(App)
 app.use(PrimeVue, {
@@ -26,5 +27,6 @@ app.component('Column', Column)
 app.component('InputText', InputText)
 app.component('DatePicker', DatePicker);
 app.use(ConfirmationService)
+app.component('Select', Select)
 
 app.mount('#app')
