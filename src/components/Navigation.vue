@@ -3,10 +3,15 @@
 
 <template>
   <nav class="navbar">
+    <div class="nav-left">
       <RouterLink to="/" active-class="active-link">Dashboard</RouterLink>
       <RouterLink to="/employees" active-class="active-link">Employees</RouterLink>
+    </div>
+    <div class="nav-right">
+      <Button label="Sign in" icon="pi pi-sign-in"></Button>
+    </div>
   </nav>
-  <Button label="Sign in" icon="pi pi-people"></Button>
+
   <RouterView/>
 
   
@@ -26,9 +31,13 @@ a{
 }
 .navbar{
   display: flex;
+  justify-content: space-between;
   align-items: center;
   border-bottom: 2px solid lightgray;
   padding-bottom: 5px;
+}
+.nav-left{
+  display: flex;
 }
 
 .nav-left span{

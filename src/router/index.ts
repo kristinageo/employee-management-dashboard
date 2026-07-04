@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import Dashboard from '@/components/Dashboard.vue'
 import EmployeeManagementIndex from '@/components/EmployeeManagementIndex.vue'
 import ViewEmployee from '@/components/ViewEmployee.vue'
-import EditEmployee from '@/components/EditEmployee.vue'
+import EmployeeForm from '@/components/EmployeeForm.vue'
 
 
 const routes = [
@@ -27,7 +27,13 @@ const routes = [
     {
         path: '/employees/edit/:code',
         name: 'employee-detail-edit',
-        component: EditEmployee,
+        component: EmployeeForm,
+        props: true
+    },
+        {
+        path: '/employees/new',
+        name: 'create-employee',
+        component: EmployeeForm,
         props: true
     }
 ]

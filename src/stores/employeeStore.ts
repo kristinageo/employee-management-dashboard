@@ -1,39 +1,83 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Employee } from '@/types/Employee'
-import employeeData from '@/data/purple_cross_employees.json';
+import employeeData from '@/data/purple_cross_employees.json'
 
 export const useEmployeeStore = defineStore('employee', () => {
+  // ---------------- STATE ----------------
   const employeesCache = ref<Employee[]>(employeeData as Employee[])
   const selectedEmployee = ref<Employee | null>(null)
 
-  function setSelectedEmployee(employee: Employee) {
+  // ---------------- GETTER ----------------
+  function getEmployeeByCode(code: string) {
+    return employeesCache.value.find(emp => emp.code === code) || null
+  }
+
+  function getEmployees(first: number, rows: number) {
+    return new Promise<{ data: Employee[], totalRecords: number }>((resolve) => {
+      setTimeout(() => {
+        const start = first
+        const end = first + rows
+
+        resolve({
+          data: employeeData.slice(start, end),
+          totalRecords: employeeData.length
+        })
+      }, 300)
+    })
+  }
+
+  // ---------------- SELECT ----------------
+  function setSelectedEmployee(employee: Employee | null) {
     selectedEmployee.value = employee
   }
 
-  // Save an array of employees to our global cache (preventing duplicates)
+  // ---------------- CREATE ----------------
+  function createEmployee(employee: Employee) {
+    employeesCache.value.push(employee)
+  }
+
+  // ---------------- UPDATE ----------------
+  function updateEmployee(employee: Employee) {
+    const index = employeesCache.value.findIndex(
+      e => e.code === employee.code
+    )
+
+    if (index !== -1) {
+      employeesCache.value[index] = employee
+    }
+  }
+
+  // ---------------- DELETE ----------------
+  function deleteEmployee(code: string) {
+    employeesCache.value = employeesCache.value.filter(
+      e => e.code !== code
+    )
+  }
+
+  // ---------------- MERGE / CACHE API DATA ----------------
   function cacheEmployees(newEmployees: Employee[]) {
     newEmployees.forEach(emp => {
-      const index = employeesCache.value.findIndex(cached => cached.code === emp.code)
+      const index = employeesCache.value.findIndex(
+        e => e.code === emp.code
+      )
+
       if (index !== -1) {
-        // If employee exists, replace it with the fresh data from the table
         employeesCache.value[index] = emp
       } else {
-        // If it's a completely new employee, add it to the list
         employeesCache.value.push(emp)
       }
     })
-  }
-  function getEmployeeByCode(code: string): Employee | null {
-    console.log(employeesCache);
-    return employeesCache.value.find(emp => emp.code === code) || null
   }
 
   return {
     employeesCache,
     selectedEmployee,
+    getEmployeeByCode,
     setSelectedEmployee,
-    cacheEmployees,
-    getEmployeeByCode
+    createEmployee,
+    updateEmployee,
+    deleteEmployee,
+    cacheEmployees
   }
 })

@@ -1,161 +1,160 @@
 <script setup lang="ts">
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Button from "primevue/button"
+import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
-import { ref, onMounted }  from 'vue'
-import type { Employee } from '@/types/Employee'
-import { getEmployees } from '@/services/employeeService'
+
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useEmployeeStore } from '@/stores/employeeStore'
 import { useConfirm } from 'primevue/useconfirm'
 
+import type { Employee } from '@/types/Employee'
+import { getEmployees } from '@/services/employeeService'
+import { useEmployeeStore } from '@/stores/employeeStore'
 
-const employees = ref<Employee[]>([]);
-const loading = ref(false);
-const totalRecords = ref(0);
 const router = useRouter()
-const {setSelectedEmployee, cacheEmployees} = useEmployeeStore()
-const confirm = useConfirm();
+const confirm = useConfirm()
+const employeeStore = useEmployeeStore()
 
-function viewEmployee(employee: Employee){
-   setSelectedEmployee(employee)
-    router.push({
-       name: 'employee-detail',
-       params: { code: employee.code }
-   })
-}    
+const employees = ref<Employee[]>([])
 
-function editEmployee(employee: Employee)
-{
-  setSelectedEmployee(employee)
+const loading = ref(false)
+const totalRecords = ref(0)
+
+// -------------------- NAVIGATION --------------------
+
+function viewEmployee(employee: Employee) {
+  employeeStore.setSelectedEmployee(employee)
+
   router.push({
-      name: 'employee-detail-edit',
-      params: { code: employee.code }
+    name: 'employee-detail',
+    params: { code: employee.code }
   })
 }
 
+function editEmployee(employee: Employee) {
+  employeeStore.setSelectedEmployee(employee)
 
-function deleteEmployee(employee: Employee)
-{
-     confirm.require({
-      message: `Are you sure you want to delete ${employee.fullName} ?`,
-      header: 'Confirmation required',
-      icon: 'pi pi-exclamation-triangle',
-      rejectProps: 
-      {
-        label: 'Close',
-        severity: 'secondary'
-      },
-      acceptProps: 
-      {
-        label:'Save',
-        severity: 'danger'
-      },
-      accept: () => {
-          employees.value = employees.value.filter(emp => emp.code != employee.code)
-          useEmployeeStore().employeesCache = useEmployeeStore().employeesCache.filter(emp => emp.code != employee.code)
-          totalRecords.value = Math.max(0, totalRecords.value - 1);
-      }
-     })
+  router.push({
+    name: 'employee-detail-edit',
+    params: { code: employee.code }
+  })
 }
 
-const getEmploymentStatus = (dateOfEmployment: string) => {
-   if(!dateOfEmployment) return 'Unknown'
-
-   const employmentDate = new Date(dateOfEmployment);
-   const now = new Date()
-
-   return employmentDate < now 
-   ? 'Currently working'
-   : 'Employed soon'
+function createEmployee() {
+  router.push({ name: 'create-employee' })
 }
 
-const getTerminationStatus = (terminationDate: string) => {
-   if(!terminationDate) return 'Unknown'
+// -------------------- DELETE --------------------
 
-   const termination = new Date(terminationDate);
-   const now = new Date()
+function deleteEmployee(employee: Employee) {
+  confirm.require({
+    message: `Are you sure you want to delete ${employee.fullName}?`,
+    header: 'Confirmation',
+    icon: 'pi pi-exclamation-triangle',
 
-   return termination < now 
-   ? 'Terminated'
-   : 'To be terminated'
+    accept: () => {
+      employeeStore.deleteEmployee(employee.code)
+      totalRecords.value = employeeStore.employeesCache.length
+    }
+  })
 }
 
+// -------------------- STATUS HELPERS --------------------
 
+function getEmploymentStatus(dateOfEmployment: string) {
+  if (!dateOfEmployment) return 'Unknown'
 
-const onPage = async (event:any) => {
-  loading.value = true;
+  const d = new Date(dateOfEmployment)
+  return d < new Date() ? 'Currently working' : 'Employed soon'
+}
+
+function getTerminationStatus(terminationDate: string) {
+  if (!terminationDate) return 'Unknown'
+
+  const d = new Date(terminationDate)
+  return d < new Date() ? 'Terminated' : 'To be terminated'
+}
+
+// -------------------- LOAD DATA --------------------
+
+const onPage = async (event: any) => {
+  loading.value = true
+
+  console.log(event.first, event.rows)
+
   const result = await getEmployees(event.first, event.rows)
-  employees.value = result.data;
-  totalRecords.value = result.totalRecords;
-  cacheEmployees(result.data);
-  loading.value = false;
 
+  console.log(result.data)
+  //employeeStore.cacheEmployees(result.data)
+  totalRecords.value = result.totalRecords
+  employees.value  = result.data;
+  console.log(result.data);
+
+  loading.value = false
 }
 
+onMounted(async () => {
+  loading.value = true
 
+  const result = await getEmployees(0, 5)
+  
 
-
-onMounted(async() => {
-  loading.value = true;
-   const result = await getEmployees(0,5);
-   employees.value = result.data;
-   totalRecords.value = result.totalRecords;
-   cacheEmployees(result.data);
-   loading.value = false;
+  // employeeStore.cacheEmployees(result.data)
+  totalRecords.value = result.totalRecords
+  employees.value  = result.data;
+  loading.value = false
 })
-
 </script>
-
 <template>
-  <ConfirmDialog></ConfirmDialog>
-  <DataTable paginator 
-      lazy
-      :value="employees" 
-      :rows="5" 
-      :totalRecords="totalRecords"
-      @page="onPage"
-      scrollable
-      scrollHeight="flex"
-      :loading="loading"
-      showCurrentPageReport
-      currentPageReportTemplate ="Showing {first} to {last} of {totalRecords}">
-      <Column field="actions" header="Actions">
-        <template #body="{data}">
-            <Button icon="pi pi-eye" text rounded @click="viewEmployee(data)"></Button>
-            <Button icon="pi pi-pencil"  text rounded @click="editEmployee(data)"></Button>
-            <Button icon="pi pi-trash"  text rounded severity="danger" @click="deleteEmployee(data)"></Button>
-        </template>
-      </Column>
-      <Column field="fullName" header="Employee Full Name" sortable/>
-      <Column field="occupation" header="Occupation" sortable/>
-      <Column field="department" header="Department" sortable/>
-      <Column field="dateOfEmployment" header="Date of Employment" sortable>
-         <template #body="{data}">
-             <span>
-                 {{ getEmploymentStatus(data.dateOfEmployment) }}
-             </span>
-         </template>
-      </Column>
-      <Column field="terminationDate" header="Termination Date" sortable >
-        <template #body="{data}">
-             <span>
-                {{(getTerminationStatus(data.terminationDate))}}
-             </span>
-        </template>
-      </Column>
+  <ConfirmDialog />
+
+  <DataTable
+    paginator
+    lazy
+    :value="employees"
+    :rows="5"
+    :totalRecords="totalRecords"
+    @page="onPage"
+    scrollable
+    scrollHeight="flex"
+    :loading="loading"
+    showCurrentPageReport
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+  >
+    <Column field="actions" header="Actions">
+      <template #body="{ data }">
+        <Button icon="pi pi-eye" text rounded @click="viewEmployee(data)" />
+        <Button icon="pi pi-pencil" text rounded @click="editEmployee(data)" />
+        <Button icon="pi pi-trash" text rounded severity="danger" @click="deleteEmployee(data)" />
+      </template>
+    </Column>
+
+    <Column field="fullName" header="Employee Full Name" sortable />
+    <Column field="occupation" header="Occupation" sortable />
+    <Column field="department" header="Department" sortable />
+
+    <Column field="dateOfEmployment" header="Date of Employment" sortable>
+      <template #body="{ data }">
+        {{ getEmploymentStatus(data.dateOfEmployment) }}
+      </template>
+    </Column>
+
+    <Column field="terminationDate" header="Termination Date" sortable>
+      <template #body="{ data }">
+        {{ getTerminationStatus(data.terminationDate) }}
+      </template>
+    </Column>
   </DataTable>
+
   <div class="add-container">
-      <Button label="Create New Employee" icon="pi pi-plus"></Button>
+    <Button label="Create New Employee" icon="pi pi-plus" @click="createEmployee" />
   </div>
 </template>
-
 <style>
 .add-container{
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
 }
-
 </style>
