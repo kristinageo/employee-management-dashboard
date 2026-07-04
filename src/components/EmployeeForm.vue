@@ -84,6 +84,7 @@ function saveEmployee() {
 function cancel() {
   router.push({ name: 'employees' })
 }
+
 </script>
 
 <template>
@@ -112,7 +113,8 @@ function cancel() {
 
     <div class="field">
       <label>Date of Employment</label>
-      <InputText v-model="form.dateOfEmployment" />
+      <!-- <InputText v-model="form.dateOfEmployment" /> -->
+      <input type="date" v-model="form.dateOfEmployment" />
       <small class="error">{{ errors.dateOfEmployment }}</small>
     </div>
 

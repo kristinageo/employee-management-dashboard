@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import DataTable from 'primevue/datatable'
+import DataTable, { type DataTableFilterMeta } from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
@@ -9,7 +9,6 @@ import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 
 import type { Employee } from '@/types/Employee'
-import { getEmployees } from '@/services/employeeService'
 import { useEmployeeStore } from '@/stores/employeeStore'
 
 const router = useRouter()
@@ -76,39 +75,49 @@ function getTerminationStatus(terminationDate: string) {
   return d < new Date() ? 'Terminated' : 'To be terminated'
 }
 
-// -------------------- LOAD DATA --------------------
-
-const onPage = async (event: any) => {
-  loading.value = true
-
-  console.log(event.first, event.rows)
-
-  const result = await getEmployees(event.first, event.rows)
-
-  console.log(result.data)
-  //employeeStore.cacheEmployees(result.data)
-  totalRecords.value = result.totalRecords
-  employees.value  = result.data;
-  console.log(result.data);
-
-  loading.value = false
-}
-
 onMounted(async () => {
   loading.value = true
-
-  const result = await getEmployees(0, 5)
-  
-
-  // employeeStore.cacheEmployees(result.data)
+  const result = await employeeStore.getEmployees(0, 5)
   totalRecords.value = result.totalRecords
   employees.value  = result.data;
   loading.value = false
 })
+
+const filters = ref<DataTableFilterMeta>({
+  global: { value: null, matchMode: 'contains' },
+  fullName: { value: null, matchMode: 'contains' },
+  department: { value: null, matchMode: 'contains' },
+  occupation: { value: null, matchMode: 'contains' },
+  dateOfEmployment: { value: null, matchMode: 'contains'}
+})
+
+
+const loadData = async (first = 0, rows = 5, filtersData?: DataTableFilterMeta, sortField?: string, sortOrder?: number) => {
+  loading.value = true
+
+  const result = await employeeStore.getEmployees(first, rows, filtersData, sortField, sortOrder)
+
+  employees.value = result.data
+  totalRecords.value = result.totalRecords
+
+  loading.value = false
+}
+
+
+const onPage = async (event: any) => {
+  loadData(event.first, event.rows, filters.value)
+}
+
+const onFilter = async (event: any) => {
+  loadData(0, 5, event.filters)
+}
+
+const onSort = async (event: any) => {
+  loadData(event.first, event.rows, filters.value, event.sortField, event.sortOrder)
+}
 </script>
 <template>
   <ConfirmDialog />
-
   <DataTable
     paginator
     lazy
@@ -116,8 +125,12 @@ onMounted(async () => {
     :rows="5"
     :totalRecords="totalRecords"
     @page="onPage"
+    v-model:filters = "filters"
+    @filter="onFilter"
+    filterDisplay="row"
     scrollable
     scrollHeight="flex"
+    @sort="onSort"
     :loading="loading"
     showCurrentPageReport
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
@@ -129,18 +142,68 @@ onMounted(async () => {
         <Button icon="pi pi-trash" text rounded severity="danger" @click="deleteEmployee(data)" />
       </template>
     </Column>
+    <Column
+    field="fullName"
+    header="Employee Full Name"
+    sortable
+    :showFilterMenu="false"
+    >
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText
+                v-model="filterModel.value"
+                @input="filterCallback()"
+                placeholder="Search Full Name"
+            />
+        </template>
+    </Column>
+    <Column
+    field="occupation"
+    header="Occupation"
+    sortable
+    :showFilterMenu="false"
+    >
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText
+                v-model="filterModel.value"
+                @input="filterCallback()"
+                placeholder="Search Occupation"
+            />
+        </template>
+    </Column>
+    <Column
+    field="department"
+    header="Department"
+    sortable
+    :showFilterMenu="false"
+    >
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText
+                v-model="filterModel.value"
+                @input="filterCallback()"
+                placeholder="Search Department"
+            />
+        </template>
+    </Column>
 
-    <Column field="fullName" header="Employee Full Name" sortable />
-    <Column field="occupation" header="Occupation" sortable />
-    <Column field="department" header="Department" sortable />
 
-    <Column field="dateOfEmployment" header="Date of Employment" sortable>
+    <Column field="dateOfEmployment" header="Date of Employment" 
+      sortable
+      filter
+      filterField="dateOfEmployment"
+      :showFilterMenu="false">
       <template #body="{ data }">
         {{ getEmploymentStatus(data.dateOfEmployment) }}
       </template>
+        <template #filter="{ filterModel, filterCallback }">
+        <InputText
+          v-model="filterModel.value"
+          placeholder="Search date..."
+          @input="filterCallback()"
+        />
+      </template>
     </Column>
 
-    <Column field="terminationDate" header="Termination Date" sortable>
+    <Column field="terminationDate" header="Termination Date" sortable filter>
       <template #body="{ data }">
         {{ getTerminationStatus(data.terminationDate) }}
       </template>
