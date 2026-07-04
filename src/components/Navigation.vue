@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
+const isLoggedIn = ref(false)
+function toggleLogin(){
+  isLoggedIn.value = true;
+}
+
 </script>
 
 <template>
@@ -8,8 +15,19 @@
       <RouterLink to="/employees" active-class="active-link">Employees</RouterLink>
     </div>
     <div class="nav-right">
-      <Button label="Sign in" icon="pi pi-sign-in"></Button>
+      <Button label="Sign in" icon="pi pi-sign-in" v-if="!isLoggedIn" @click="toggleLogin()"></Button>
+      <span v-else class="login-badge">
+        <i class="pi pi-user"></i>
+        Logged in
+        <Button
+          icon="pi pi-sign-out"
+          text
+          rounded
+          @click="toggleLogin"
+        />
+      </span>
     </div>
+  
   </nav>
 
   <RouterView/>
