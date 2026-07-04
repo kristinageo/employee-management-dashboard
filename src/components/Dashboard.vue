@@ -34,4 +34,18 @@ const stats = computed(() => [
   </div>
 
 </template>
-<style></style>
+<style>
+.dashboard{
+  padding: 10px;
+}
+.cards{
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px, 1fr));
+  gap: 2px;
+}
+.card{
+  text-align: center;
+  margin: 2px;
+  background-color: lightblue;
+}
+</style>

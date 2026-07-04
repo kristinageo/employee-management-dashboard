@@ -141,14 +141,46 @@ function cancel() {
 <style>
 .field {
   margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
 }
 .error {
   color: red;
   font-size: 12px;
+  margin-top: 4px;
 }
 .actions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+  margin-top: 2px;
+}
+
+.form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* MOBILE VIEW*/
+@media (max-width: 768px) {
+  .form-container {
+    padding: 1rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions .p-button {
+    width: 100%;
+  }
 }
 </style>

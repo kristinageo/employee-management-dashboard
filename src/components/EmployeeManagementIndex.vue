@@ -116,11 +116,11 @@ const onSort = async (event: any) => {
   loadData(event.first, event.rows, filters.value, event.sortField, event.sortOrder)
 }
 
-const statusOptions = [
-  { label: 'Active', value: 'Active' },
-  { label: 'To be terminated', value: 'To be terminated' },
-  { label: 'Terminated', value: 'Terminated' }
-]
+// const statusOptions = [
+//   { label: 'Active', value: 'Active' },
+//   { label: 'To be terminated', value: 'To be terminated' },
+//   { label: 'Terminated', value: 'Terminated' }
+// ]
 
 </script>
 <template>
@@ -140,6 +140,8 @@ const statusOptions = [
     @sort="onSort"
     :loading="loading"
     showCurrentPageReport
+    breakpoint="960px"
+    responsiveLayout="scroll"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
   >
     <Column field="actions" header="Actions">
@@ -204,7 +206,7 @@ const statusOptions = [
         <template #filter="{ filterModel, filterCallback }">
         <InputText
           v-model="filterModel.value"
-          placeholder="Search date..."
+          placeholder="Search Employment date..."
           @input="filterCallback()"
         />
       </template>
@@ -226,5 +228,37 @@ const statusOptions = [
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
+}
+.actions{
+  display: flex;
+  gap: 1px;
+  flex-wrap: wrap;
+}
+.p-datatable{
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .add-container {
+    justify-content: center;
+  }
+
+  .p-datatable {
+    font-size: 10px;
+  }
+
+  .actions {
+    justify-content: center;
+  }
+
+  .p-column-filter {
+    width: 100%;
+    min-width: 120px;
+  }
+
+  .add-container .p-button {
+    width: 100%;
+    max-width: 300px;
+  }
 }
 </style>
